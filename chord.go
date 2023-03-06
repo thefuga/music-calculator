@@ -2,102 +2,128 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
-const (
-	PerfectUnison = iota
-	MinorSecond
-	MajorSecond
-	MinorThird
-	MajorThird
-	PerfectFourth
-	Tritone
-	PerfectFifth
-	MinorSixth
-	MajorSixth
-	MinorSiventh
-	MajorSeventh
-	Octave
-)
-
-const (
-	A = iota
-	Ax
-	B
-	C
-	Cx
-	D
-	Dx
-	E
-	F
-	Fx
-	G
-	Gx
-)
-
 var (
-	Relationships [12][12]Interval
-	MajorTriad = [3]Interval{PerfectUnison, MajorThird, PerfectFifth}
+	MajorTriadIntervals      = Intervals{PerfectUnison, MajorThird, PerfectFifth}
+	MinorTriadIntervals      = Intervals{PerfectUnison, MinorThird, PerfectFifth}
+	DiminishedTriadIntervals = Intervals{PerfectUnison, MinorThird, Tritone}
+	AugmentedTriadIntervals  = Intervals{PerfectUnison, MajorThird, AugmentedFifth}
+	Sus2TriadIntervals       = Intervals{PerfectUnison, MajorSecond, PerfectFifth}
+	Sus4TriadIntervals       = Intervals{PerfectUnison, PerfectFourth, PerfectFifth}
 )
 
 type (
-	Note  int
-	Chord struct {
-		Name      string
-		Notes []Note
-		Intervals []Interval
+	Interval  int
+	Intervals []Interval
+
+	Chord interface {
+		String() string
+		Root() Note
 	}
-	Interval int
+
+	chord struct {
+		Name          string
+		Notes         []Note
+		Quality       string
+		Type          int
+		Intervals     Intervals
+		FormulaFormat string
+	}
+
+	regularTriadChord struct {
+		chord
+	}
+
+	susTriadChord struct {
+		chord
+	}
 )
 
-func (note Note) AscendingDistance(to Note) Interval {
-	return Relationships[note][to]
+func (note Note) String() string {
+	return note.Name
 }
 
-func (note Note) DescendingDistance(to Note) Interval {
-	return Relationships[to][note]
+func NewChord(notes ...Note) Chord {
+	if notes == nil {
+		panic("empty notes")
+	}
+
+	baseChord := chord{Notes: notes}
+
+	for _, note := range baseChord.Notes {
+		baseChord.Intervals = append(
+			baseChord.Intervals,
+			baseChord.Root().AscendingDistance(note),
+		)
+	}
+
+	switch baseChord.Intervals.String() {
+	case MajorTriadIntervals.String():
+		baseChord.FormulaFormat = regularTriadFormat
+		baseChord.Quality = MajorQuality
+
+		return regularTriadChord{baseChord}
+	case MinorTriadIntervals.String():
+		baseChord.Quality = MinorQuality
+		baseChord.FormulaFormat = regularTriadFormat
+
+		return regularTriadChord{baseChord}
+	case DiminishedTriadIntervals.String():
+		baseChord.Quality = DiminishedQuality
+		baseChord.FormulaFormat = regularTriadFormat
+
+		return regularTriadChord{baseChord}
+	case AugmentedTriadIntervals.String():
+		baseChord.Quality = AugmentedQuality
+		baseChord.FormulaFormat = regularTriadFormat
+
+		return regularTriadChord{baseChord}
+	case Sus2TriadIntervals.String():
+		baseChord.Quality = MajorQuality // TODO check this
+		baseChord.FormulaFormat = sus2TriadFormat
+
+		return susTriadChord{baseChord}
+	case Sus4TriadIntervals.String():
+		baseChord.Quality = MajorQuality // TODO check this
+		baseChord.FormulaFormat = sus4TriadFormat
+
+		return susTriadChord{baseChord}
+	default:
+		panic("unknown formula")
+	}
 }
 
-func NewChord(notes ...Note) {
-	chord := Chord{Notes: notes}
-	
-	for _, note := range notes {
-chord.Intervals 
-	}
-	switch {
-
-	}
+func (chord regularTriadChord) String() string {
+	return fmt.Sprintf(
+		chord.FormulaFormat,
+		chord.Root().String(),
+		chord.Quality,
+	)
 }
 
-
-
-func initRelationships() {
-	for from := 0; from < 12; from++ {
-		for to := 0; to < 12; to++ {
-			Relationships[from][to] = calculateInterval(from, to)
-		}
-	}
+func (chord susTriadChord) String() string {
+	return fmt.Sprintf(
+		chord.FormulaFormat,
+		chord.Root().String(),
+	)
 }
 
-func calculateInterval(from, to int) Interval {
-	if from < to {
-		return Interval(to - from)
-	}
-
-	if from > to {
-		return Interval(-to + from)
-	}
-
-	return PerfectUnison
+func (chord chord) Root() Note {
+	return chord.Notes[0]
 }
 
-func main() {
-	initRelationships()
-	for i := 0; i < 12; i++ {
-		for j := 0; j < 12; j++ {
-			fmt.Printf("%d  ", Relationships[i][j])
-		}
-		fmt.Println()
+func (chord chord) NotesCount() int {
+	return len(chord.Notes)
+}
+
+func (intervals Intervals) String() string {
+	var intervalsString []string
+	for _, interval := range intervals {
+		intervalsString = append(intervalsString, strconv.Itoa(int(interval)))
 	}
+
+	return strings.Join(intervalsString, " ")
 }
