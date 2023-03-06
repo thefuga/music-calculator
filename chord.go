@@ -7,38 +7,30 @@ import (
 )
 
 var (
+	PowerChordIntervals      = Intervals{PerfectUnison, PerfectFifth}
 	MajorTriadIntervals      = Intervals{PerfectUnison, MajorThird, PerfectFifth}
 	MinorTriadIntervals      = Intervals{PerfectUnison, MinorThird, PerfectFifth}
 	DiminishedTriadIntervals = Intervals{PerfectUnison, MinorThird, Tritone}
 	AugmentedTriadIntervals  = Intervals{PerfectUnison, MajorThird, AugmentedFifth}
 	Sus2TriadIntervals       = Intervals{PerfectUnison, MajorSecond, PerfectFifth}
 	Sus4TriadIntervals       = Intervals{PerfectUnison, PerfectFourth, PerfectFifth}
+	MajorSeventhIntervals    = Intervals{PerfectUnison, MajorThird, PerfectFifth, MajorSeventh}
+	MinorSeventhIntervals    = Intervals{PerfectUnison, MinorThird, PerfectFifth, MinorSeventh}
+	DominantSeventhIntervals = Intervals{PerfectUnison, MajorThird, PerfectFifth, MinorSeventh}
 )
 
 type (
 	Interval  int
 	Intervals []Interval
 
-	Chord interface {
-		String() string
-		Root() Note
-	}
-
-	chord struct {
+	Chord struct {
 		Name          string
 		Notes         []Note
 		Quality       string
 		Type          int
 		Intervals     Intervals
 		FormulaFormat string
-	}
-
-	regularTriadChord struct {
-		chord
-	}
-
-	susTriadChord struct {
-		chord
+		formatArgs    []interface{}
 	}
 )
 
@@ -51,71 +43,75 @@ func NewChord(notes ...Note) Chord {
 		panic("empty notes")
 	}
 
-	baseChord := chord{Notes: notes}
+	chord := Chord{Notes: notes}
 
-	for _, note := range baseChord.Notes {
-		baseChord.Intervals = append(
-			baseChord.Intervals,
-			baseChord.Root().AscendingDistance(note),
+	for _, note := range chord.Notes {
+		chord.Intervals = append(
+			chord.Intervals,
+			chord.Root().AscendingDistance(note),
 		)
 	}
 
-	switch baseChord.Intervals.String() {
+	switch chord.Intervals.String() {
+	case PowerChordIntervals.String():
+		chord.FormulaFormat = powerChordFormat
+		chord.Quality = MajorQuality
+		chord.formatArgs = []interface{}{chord.Root()}
 	case MajorTriadIntervals.String():
-		baseChord.FormulaFormat = regularTriadFormat
-		baseChord.Quality = MajorQuality
-
-		return regularTriadChord{baseChord}
+		chord.FormulaFormat = regularTriadFormat
+		chord.Quality = MajorQuality
+		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
 	case MinorTriadIntervals.String():
-		baseChord.Quality = MinorQuality
-		baseChord.FormulaFormat = regularTriadFormat
-
-		return regularTriadChord{baseChord}
+		chord.Quality = MinorQuality
+		chord.FormulaFormat = regularTriadFormat
+		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
 	case DiminishedTriadIntervals.String():
-		baseChord.Quality = DiminishedQuality
-		baseChord.FormulaFormat = regularTriadFormat
-
-		return regularTriadChord{baseChord}
+		chord.Quality = DiminishedQuality
+		chord.FormulaFormat = regularTriadFormat
+		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
 	case AugmentedTriadIntervals.String():
-		baseChord.Quality = AugmentedQuality
-		baseChord.FormulaFormat = regularTriadFormat
-
-		return regularTriadChord{baseChord}
+		chord.Quality = AugmentedQuality
+		chord.FormulaFormat = regularTriadFormat
+		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
 	case Sus2TriadIntervals.String():
-		baseChord.Quality = MajorQuality // TODO check this
-		baseChord.FormulaFormat = sus2TriadFormat
-
-		return susTriadChord{baseChord}
+		chord.Quality = MajorQuality // TODO check this
+		chord.FormulaFormat = sus2TriadFormat
+		chord.formatArgs = []interface{}{chord.Root()}
 	case Sus4TriadIntervals.String():
-		baseChord.Quality = MajorQuality // TODO check this
-		baseChord.FormulaFormat = sus4TriadFormat
-
-		return susTriadChord{baseChord}
+		chord.Quality = MajorQuality // TODO check this
+		chord.FormulaFormat = sus4TriadFormat
+		chord.formatArgs = []interface{}{chord.Root()}
+	case MajorSeventhIntervals.String():
+		chord.Quality = MajorQuality
+		chord.FormulaFormat = seventhChordFormat
+		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
+	case MinorSeventhIntervals.String():
+		chord.Quality = MinorQuality
+		chord.FormulaFormat = seventhChordFormat
+		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
+	case DominantSeventhIntervals.String():
+		chord.Quality = MajorQuality
+		chord.FormulaFormat = dominantSeventhChordFormat
+		chord.formatArgs = []interface{}{chord.Root()}
 	default:
 		panic("unknown formula")
 	}
+
+	return chord
 }
 
-func (chord regularTriadChord) String() string {
+func (chord Chord) String() string {
 	return fmt.Sprintf(
 		chord.FormulaFormat,
-		chord.Root().String(),
-		chord.Quality,
+		chord.formatArgs...,
 	)
 }
 
-func (chord susTriadChord) String() string {
-	return fmt.Sprintf(
-		chord.FormulaFormat,
-		chord.Root().String(),
-	)
-}
-
-func (chord chord) Root() Note {
+func (chord Chord) Root() Note {
 	return chord.Notes[0]
 }
 
-func (chord chord) NotesCount() int {
+func (chord Chord) NotesCount() int {
 	return len(chord.Notes)
 }
 
