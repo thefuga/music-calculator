@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 var (
 	Ab = Note{11, "Ab"}
 	A  = Note{0, "A"}
@@ -21,8 +23,8 @@ var (
 )
 
 type Note struct {
-	Code int
-	Name string
+	Code   int
+	Letter string
 }
 
 func (note Note) AscendingDistance(to Note) Interval {
@@ -31,4 +33,12 @@ func (note Note) AscendingDistance(to Note) Interval {
 	}
 
 	return Interval(to.Code - note.Code)
+}
+
+func (note Note) IsFlat() bool {
+	return strings.Contains(note.Letter, "b")
+}
+
+func (note Note) IsSharp() bool {
+	return strings.Contains(note.Letter, "#")
 }
