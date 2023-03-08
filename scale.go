@@ -1,67 +1,32 @@
 package main
 
+import (
+	"math"
+)
+
 var (
-	MajorScaleInterv = Intervals{}
-
-	noteLetterToCode = map[string]int{
-		"Ab": 11,
-		"A":  0,
-		"Ax": 1,
-		"Bb": 1,
-		"B ": 2,
-		"C ": 3,
-		"Cx": 4,
-		"Db": 4,
-		"D ": 5,
-		"Dx": 6,
-		"Eb": 6,
-		"E ": 7,
-		"F ": 8,
-		"Fx": 9,
-		"Gb": 9,
-		"G ": 10,
-		"Gx": 11,
+	MajorScaleIntervals = Intervals{
+		PerfectUnison,
+		MajorSecond,
+		MajorThird,
+		PerfectFourth,
+		PerfectFifth,
+		MajorSixth,
+		MajorSeventh,
 	}
 
-	chromaticScaleWithSharps = []Note{
-		A,
-		Ax,
-		B,
-		C,
-		Cx,
-		D,
-		E,
-		Dx,
-		F,
-		Fx,
-		G,
-		Gx,
+	MinorScaleIntervals = Intervals{
+		PerfectUnison,
+		MajorSecond,
+		MinorThird,
+		PerfectFourth,
+		PerfectFifth,
+		MinorSixth,
+		MinorSeventh,
 	}
 
-	chromaticScaleWithFlats = []Note{
-		A,
-		Bb,
-		B,
-		C,
-		Db,
-		D,
-		Eb,
-		E,
-		F,
-		Gb,
-		G,
-		Ab,
-	}
-
-	naturalScale = []Note{
-		A,
-		B,
-		C,
-		D,
-		E,
-		F,
-		G,
-	}
+	chromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
+	chromaticScaleWithFlats  = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
 )
 
 type (
@@ -71,6 +36,20 @@ type (
 	}
 )
 
+func NewMajorScale(key Note) Scale {
+	return Scale{
+		Key:       key,
+		Intervals: MajorScaleIntervals,
+	}
+}
+
+func NewMinorScale(key Note) Scale {
+	return Scale{
+		Key:       key,
+		Intervals: MinorScaleIntervals,
+	}
+}
+
 func (s Scale) Notes() []Note {
 	if s.Key.IsFlat() {
 		return s.notesFromChromaticScale(chromaticScaleWithFlats)
@@ -79,15 +58,81 @@ func (s Scale) Notes() []Note {
 	return s.notesFromChromaticScale(chromaticScaleWithSharps)
 }
 
+func (s Scale) RelativeMinor() Scale {
+	return NewMinorScale(s.Notes()[5])
+}
+
+func (s Scale) RelativeMajor() Scale {
+	return NewMajorScale(s.Notes()[2])
+}
+
+func (s Scale) CountSharps() (sharps int) {
+	for _, note := range s.Notes() {
+		if note.IsSharp() {
+			sharps++
+		}
+	}
+
+	return
+}
+
+func (s Scale) CountFlats() (flats int) {
+	for _, note := range s.Notes() {
+		if note.IsFlat() {
+			flats++
+		}
+	}
+
+	return
+}
+
 func (s Scale) notesFromChromaticScale(dict []Note) []Note {
 	notes := make([]Note, 0, len(s.Intervals))
 
 	for _, interval := range s.Intervals {
-		notes = append(
-			notes,
-			chromaticScaleWithFlats[s.Key.AscendingDistance(dict[interval])],
-		)
+		var note Note
+		if (int(interval) + s.Key.Code) < MusicalNotesCount {
+			note = dict[int(interval)+s.Key.Code]
+		} else {
+			note = dict[(int(interval)+s.Key.Code)-MusicalNotesCount]
+		}
+
+		notes = append(notes, note)
 	}
 
 	return notes
+}
+
+func (s Scale) DiatonicTriads() []Chord {
+	var triads []Chord
+
+	notes := s.Notes()
+
+	for i := range notes {
+		root := notes[i]
+
+		third := notes[int(math.Mod(float64(i+2), float64(len(notes))))]
+		fifth := notes[int(math.Mod(float64(i+4), float64(len(notes))))]
+
+		triads = append(triads, NewChord(root, third, fifth))
+	}
+
+	return triads
+}
+
+func (s Scale) DiatonicQuadrads() []Chord {
+	var quadrads []Chord
+
+	notes := s.Notes()
+
+	for i := range notes {
+		root := notes[i]
+		third := notes[int(math.Mod(float64(i+2), float64(len(notes))))]
+		fifth := notes[int(math.Mod(float64(i+4), float64(len(notes))))]
+		seventh := notes[int(math.Mod(float64(i+6), float64(len(notes))))]
+
+		quadrads = append(quadrads, NewChord(root, third, fifth, seventh))
+	}
+
+	return quadrads
 }

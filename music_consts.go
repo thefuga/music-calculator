@@ -3,6 +3,8 @@ package main
 // Universal values
 const (
 	MusicalNotesCount = 12
+	HalfStep          = 1
+	WholeStep         = 2
 )
 
 // Intervals
@@ -35,12 +37,13 @@ const (
 )
 
 const (
-	regularTriadFormat         string = "%s %s"
-	sus2TriadFormat            string = "%ssus2"
-	sus4TriadFormat            string = "%ssus4"
-	seventhChordFormat         string = "%s %s 7"
-	dominantSeventhChordFormat string = "%s7"
-	powerChordFormat                  = "%s5"
+	regularTriadFormat               string = "%s %s"
+	sus2TriadFormat                  string = "%ssus2"
+	sus4TriadFormat                  string = "%ssus4"
+	seventhChordFormat               string = "%s %s 7"
+	dominantSeventhChordFormat       string = "%s7"
+	halfDiminishedSeventhChordFormat string = "%sm7b5"
+	powerChordFormat                        = "%s5"
 
 	// TODO
 	// Major w/ added 9th: 1 - 3 - 5 - 9

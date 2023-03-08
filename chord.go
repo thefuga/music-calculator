@@ -2,27 +2,23 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 )
 
 var (
-	PowerChordIntervals      = Intervals{PerfectUnison, PerfectFifth}
-	MajorTriadIntervals      = Intervals{PerfectUnison, MajorThird, PerfectFifth}
-	MinorTriadIntervals      = Intervals{PerfectUnison, MinorThird, PerfectFifth}
-	DiminishedTriadIntervals = Intervals{PerfectUnison, MinorThird, Tritone}
-	AugmentedTriadIntervals  = Intervals{PerfectUnison, MajorThird, AugmentedFifth}
-	Sus2TriadIntervals       = Intervals{PerfectUnison, MajorSecond, PerfectFifth}
-	Sus4TriadIntervals       = Intervals{PerfectUnison, PerfectFourth, PerfectFifth}
-	MajorSeventhIntervals    = Intervals{PerfectUnison, MajorThird, PerfectFifth, MajorSeventh}
-	MinorSeventhIntervals    = Intervals{PerfectUnison, MinorThird, PerfectFifth, MinorSeventh}
-	DominantSeventhIntervals = Intervals{PerfectUnison, MajorThird, PerfectFifth, MinorSeventh}
+	PowerChordIntervals            = Intervals{PerfectUnison, PerfectFifth}
+	MajorTriadIntervals            = Intervals{PerfectUnison, MajorThird, PerfectFifth}
+	MinorTriadIntervals            = Intervals{PerfectUnison, MinorThird, PerfectFifth}
+	DiminishedTriadIntervals       = Intervals{PerfectUnison, MinorThird, Tritone}
+	AugmentedTriadIntervals        = Intervals{PerfectUnison, MajorThird, AugmentedFifth}
+	Sus2TriadIntervals             = Intervals{PerfectUnison, MajorSecond, PerfectFifth}
+	Sus4TriadIntervals             = Intervals{PerfectUnison, PerfectFourth, PerfectFifth}
+	MajorSeventhIntervals          = Intervals{PerfectUnison, MajorThird, PerfectFifth, MajorSeventh}
+	MinorSeventhIntervals          = Intervals{PerfectUnison, MinorThird, PerfectFifth, MinorSeventh}
+	DominantSeventhIntervals       = Intervals{PerfectUnison, MajorThird, PerfectFifth, MinorSeventh}
+	HalfDiminishedSeventhIntervals = Intervals{PerfectUnison, MinorThird, Tritone, MinorSeventh}
 )
 
 type (
-	Interval  int
-	Intervals []Interval
-
 	Chord struct {
 		Name          string
 		Notes         []Note
@@ -33,10 +29,6 @@ type (
 		formatArgs    []interface{}
 	}
 )
-
-func (note Note) String() string {
-	return note.Name
-}
 
 func NewChord(notes ...Note) Chord {
 	if notes == nil {
@@ -93,6 +85,10 @@ func NewChord(notes ...Note) Chord {
 		chord.Quality = MajorQuality
 		chord.FormulaFormat = dominantSeventhChordFormat
 		chord.formatArgs = []interface{}{chord.Root()}
+	case HalfDiminishedSeventhIntervals.String():
+		chord.Quality = DiminishedQuality
+		chord.FormulaFormat = halfDiminishedSeventhChordFormat
+		chord.formatArgs = []interface{}{chord.Root()}
 	default:
 		panic("unknown formula")
 	}
@@ -113,13 +109,4 @@ func (chord Chord) Root() Note {
 
 func (chord Chord) NotesCount() int {
 	return len(chord.Notes)
-}
-
-func (intervals Intervals) String() string {
-	var intervalsString []string
-	for _, interval := range intervals {
-		intervalsString = append(intervalsString, strconv.Itoa(int(interval)))
-	}
-
-	return strings.Join(intervalsString, " ")
 }
