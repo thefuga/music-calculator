@@ -25,18 +25,8 @@ var (
 		MinorSeventh,
 	}
 
-	ChromaticScaleWithSharps        = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
-	ChromaticScaleWithFlats         = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
-	EnharmonicEquivalentAccidentals = map[Note]Note{
-		B:  Cb,
-		C:  Bx,
-		E:  Fb,
-		F:  Ex,
-		Cb: B,
-		Bx: C,
-		Fb: E,
-		Ex: F,
-	}
+	ChromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
+	ChromaticScaleWithFlats  = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
 )
 
 type (

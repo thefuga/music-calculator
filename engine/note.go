@@ -29,6 +29,17 @@ var (
 	G  = Note{Code: 10, Letter: "G"}
 	Gx = Note{Code: 11, Letter: "G", Sharp: true}
 
+	EnharmonicEquivalentAccidentals = map[Note]Note{
+		B:  Cb,
+		C:  Bx,
+		E:  Fb,
+		F:  Ex,
+		Bx: C,
+		Cb: B,
+		Ex: F,
+		Fb: E,
+	}
+
 	// TODO remove this
 	NoteLetterToCode = map[string]int{
 		"A": 0,
@@ -82,4 +93,12 @@ func (note Note) String() string {
 
 func (note Note) IsSharp() bool {
 	return note.Sharp
+}
+
+func (note Note) EnharmonicEquivalent() Note {
+	if eqv, ok := EnharmonicEquivalentAccidentals[note]; ok {
+		return eqv
+	}
+
+	return note
 }
