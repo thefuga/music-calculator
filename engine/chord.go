@@ -32,7 +32,7 @@ type (
 )
 
 func BuildChord(notes ...Note) Chord {
-	if notes == nil {
+	if len(notes) < 2 {
 		panic("empty notes")
 	}
 

@@ -25,8 +25,18 @@ var (
 		MinorSeventh,
 	}
 
-	ChromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
-	ChromaticScaleWithFlats  = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
+	ChromaticScaleWithSharps        = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
+	ChromaticScaleWithFlats         = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
+	EnharmonicEquivalentAccidentals = map[Note]Note{
+		B:  Cb,
+		C:  Bx,
+		E:  Fb,
+		F:  Ex,
+		Cb: B,
+		Bx: C,
+		Fb: E,
+		Ex: F,
+	}
 )
 
 type (
@@ -75,7 +85,11 @@ func (s Scale) RelativeMajor() Scale {
 }
 
 func (s Scale) CountSharps() (sharps int) {
-	for _, note := range s.Notes() {
+	if s.Key.IsFlat() {
+		panic("cannot count sharps on a scale with a flat key. Apply the enharmonic equivalent first.")
+	}
+
+	for _, note := range s.NotesWithSharps() {
 		if note.IsSharp() {
 			sharps++
 		}
@@ -85,6 +99,10 @@ func (s Scale) CountSharps() (sharps int) {
 }
 
 func (s Scale) CountFlats() (flats int) {
+	if s.Key.IsSharp() {
+		panic("cannot count flats on a scale with a sharp key. Apply the enharmonic equivalent first.")
+	}
+
 	for _, note := range s.NotesWithFlats() {
 		if note.IsFlat() {
 			flats++
@@ -97,7 +115,8 @@ func (s Scale) CountFlats() (flats int) {
 func (s Scale) notesFromChromaticScale(dict []Note) []Note {
 	notes := make([]Note, 0, len(s.Intervals))
 
-	for _, interval := range s.Intervals {
+	notes = append(notes, s.Key)
+	for _, interval := range s.Intervals[1:] {
 		var note Note
 		if (int(interval) + s.Key.Code) < MusicalNotesCount {
 			note = dict[int(interval)+s.Key.Code]
@@ -106,6 +125,25 @@ func (s Scale) notesFromChromaticScale(dict []Note) []Note {
 		}
 
 		notes = append(notes, note)
+	}
+
+	return distinctNotes(notes)
+}
+
+func distinctNotes(notes []Note) []Note {
+	seen := make(map[string]struct{})
+
+	for i := range notes {
+		if _, ok := seen[notes[i].Letter]; ok {
+			if _, ok := EnharmonicEquivalentAccidentals[notes[i]]; ok {
+				notes[i] = EnharmonicEquivalentAccidentals[notes[i]]
+			} else {
+				notes[i-1] = EnharmonicEquivalentAccidentals[notes[i-1]]
+				seen[notes[i].Letter] = struct{}{}
+			}
+		} else {
+			seen[notes[i].Letter] = struct{}{}
+		}
 	}
 
 	return notes
