@@ -1,4 +1,4 @@
-package main
+package engine
 
 import (
 	"math"
@@ -25,8 +25,8 @@ var (
 		MinorSeventh,
 	}
 
-	chromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
-	chromaticScaleWithFlats  = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
+	ChromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
+	ChromaticScaleWithFlats  = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
 )
 
 type (
@@ -52,10 +52,10 @@ func NewMinorScale(key Note) Scale {
 
 func (s Scale) Notes() []Note {
 	if s.Key.IsFlat() {
-		return s.notesFromChromaticScale(chromaticScaleWithFlats)
+		return s.notesFromChromaticScale(ChromaticScaleWithFlats)
 	}
 
-	return s.notesFromChromaticScale(chromaticScaleWithSharps)
+	return s.notesFromChromaticScale(ChromaticScaleWithSharps)
 }
 
 func (s Scale) RelativeMinor() Scale {

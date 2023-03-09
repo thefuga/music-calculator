@@ -1,4 +1,4 @@
-package main
+package engine
 
 import (
 	"strings"
@@ -23,7 +23,7 @@ var (
 	G  = Note{Code: 10, Letter: "G"}
 	Gx = Note{Code: 11, Letter: "G", Sharp: true}
 
-	noteLetterToCode = map[string]int{
+	NoteLetterToCode = map[string]int{
 		"A":  0,
 		"Ax": 1,
 		"Bb": 1,
@@ -61,10 +61,10 @@ func (note Note) AscendingDistance(to Note) Interval {
 
 func (note Note) Add(interval Interval) Note {
 	if (int(interval) + note.Code) < MusicalNotesCount {
-		return chromaticScaleWithSharps[int(interval)+note.Code]
+		return ChromaticScaleWithSharps[int(interval)+note.Code]
 	}
 
-	return chromaticScaleWithSharps[(int(interval)+note.Code)-MusicalNotesCount]
+	return ChromaticScaleWithSharps[(int(interval)+note.Code)-MusicalNotesCount]
 }
 
 func (note Note) IsFlat() bool {

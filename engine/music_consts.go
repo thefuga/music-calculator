@@ -1,4 +1,4 @@
-package main
+package engine
 
 // Universal values
 const (
