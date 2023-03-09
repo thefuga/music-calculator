@@ -52,10 +52,18 @@ func NewMinorScale(key Note) Scale {
 
 func (s Scale) Notes() []Note {
 	if s.Key.IsFlat() {
-		return s.notesFromChromaticScale(ChromaticScaleWithFlats)
+		return s.NotesWithFlats()
 	}
 
+	return s.NotesWithSharps()
+}
+
+func (s Scale) NotesWithSharps() []Note {
 	return s.notesFromChromaticScale(ChromaticScaleWithSharps)
+}
+
+func (s Scale) NotesWithFlats() []Note {
+	return s.notesFromChromaticScale(ChromaticScaleWithFlats)
 }
 
 func (s Scale) RelativeMinor() Scale {
@@ -77,7 +85,7 @@ func (s Scale) CountSharps() (sharps int) {
 }
 
 func (s Scale) CountFlats() (flats int) {
-	for _, note := range s.Notes() {
+	for _, note := range s.NotesWithFlats() {
 		if note.IsFlat() {
 			flats++
 		}
@@ -114,7 +122,7 @@ func (s Scale) DiatonicTriads() []Chord {
 		third := notes[int(math.Mod(float64(i+2), float64(len(notes))))]
 		fifth := notes[int(math.Mod(float64(i+4), float64(len(notes))))]
 
-		triads = append(triads, NewChord(root, third, fifth))
+		triads = append(triads, BuildChord(root, third, fifth))
 	}
 
 	return triads
@@ -131,7 +139,7 @@ func (s Scale) DiatonicQuadrads() []Chord {
 		fifth := notes[int(math.Mod(float64(i+4), float64(len(notes))))]
 		seventh := notes[int(math.Mod(float64(i+6), float64(len(notes))))]
 
-		quadrads = append(quadrads, NewChord(root, third, fifth, seventh))
+		quadrads = append(quadrads, BuildChord(root, third, fifth, seventh))
 	}
 
 	return quadrads

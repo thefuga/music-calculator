@@ -1,9 +1,5 @@
 package engine
 
-import (
-	"strings"
-)
-
 var (
 	Ab = Note{Code: 11, Letter: "A", Flat: true}
 	A  = Note{Code: 0, Letter: "A"}
@@ -68,23 +64,21 @@ func (note Note) Add(interval Interval) Note {
 }
 
 func (note Note) IsFlat() bool {
-	return strings.Contains(note.Letter, "b")
+	return note.Flat
 }
 
 func (note Note) String() string {
-	str := note.Letter
-
 	if note.Flat {
-		str += "b"
+		return note.Letter + "b"
 	}
 
 	if note.Sharp {
-		str += "#"
+		return note.Letter + "#"
 	}
 
-	return str
+	return note.Letter
 }
 
 func (note Note) IsSharp() bool {
-	return strings.Contains(note.Letter, "#")
+	return note.Sharp
 }

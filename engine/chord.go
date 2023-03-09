@@ -20,17 +20,18 @@ var (
 
 type (
 	Chord struct {
-		Name          string
-		Notes         []Note
-		Quality       string
-		Type          int
-		Intervals     Intervals
+		Name      string
+		Notes     []Note
+		Quality   string
+		Type      int
+		Intervals Intervals
+
 		FormulaFormat string
 		formatArgs    []interface{}
 	}
 )
 
-func NewChord(notes ...Note) Chord {
+func BuildChord(notes ...Note) Chord {
 	if notes == nil {
 		panic("empty notes")
 	}
