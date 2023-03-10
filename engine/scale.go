@@ -25,14 +25,20 @@ var (
 		MinorSeventh,
 	}
 
-	PentatonicMajorScale = Intervals{
+	MajorPentatonicScale = Intervals{
 		PerfectUnison,
 		MajorSecond,
 		MajorThird,
-		PerfectFourth,
 		PerfectFifth,
 		MajorSixth,
-		MajorSeventh,
+	}
+
+	MinorPentatonicScale = Intervals{
+		PerfectUnison,
+		MinorThird,
+		PerfectFifth,
+		MinorSixth,
+		MinorSeventh,
 	}
 
 	ChromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
@@ -57,6 +63,20 @@ func NewMinorScale(key Note) Scale {
 	return Scale{
 		Key:       key,
 		Intervals: MinorScaleIntervals,
+	}
+}
+
+func NewMajorPentatonicScale(key Note) Scale {
+	return Scale{
+		Key:       key,
+		Intervals: MajorPentatonicScale,
+	}
+}
+
+func NewMinorPentatonicScale(key Note) Scale {
+	return Scale{
+		Key:       key,
+		Intervals: MinorPentatonicScale,
 	}
 }
 
