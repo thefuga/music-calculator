@@ -1,9 +1,5 @@
 package engine
 
-import (
-	"fmt"
-)
-
 var (
 	PowerChordIntervals            = Intervals{PerfectUnison, PerfectFifth}
 	MajorTriadIntervals            = Intervals{PerfectUnison, MajorThird, PerfectFifth}
@@ -20,20 +16,18 @@ var (
 
 type (
 	Chord struct {
+		Type      int
 		Name      string
 		Notes     []Note
-		Quality   string
-		Type      int
 		Intervals Intervals
-
-		FormulaFormat string
-		formatArgs    []interface{}
 	}
+
+	ChordFormula string
 )
 
 func BuildChord(notes ...Note) Chord {
 	if len(notes) < 2 {
-		panic("empty notes")
+		panic("not enough notes")
 	}
 
 	chord := Chord{Notes: notes}
@@ -45,67 +39,36 @@ func BuildChord(notes ...Note) Chord {
 		)
 	}
 
-	switch chord.Intervals.String() {
-	case PowerChordIntervals.String():
-		chord.FormulaFormat = powerChordFormat
-		chord.Quality = MajorQuality
-		chord.formatArgs = []interface{}{chord.Root()}
-	case MajorTriadIntervals.String():
-		chord.FormulaFormat = regularTriadFormat
-		chord.Quality = MajorQuality
-		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
-	case MinorTriadIntervals.String():
-		chord.Quality = MinorQuality
-		chord.FormulaFormat = regularTriadFormat
-		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
-	case DiminishedTriadIntervals.String():
-		chord.Quality = DiminishedQuality
-		chord.FormulaFormat = regularTriadFormat
-		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
-	case AugmentedTriadIntervals.String():
-		chord.Quality = AugmentedQuality
-		chord.FormulaFormat = regularTriadFormat
-		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
-	case Sus2TriadIntervals.String():
-		chord.Quality = MajorQuality // TODO check this
-		chord.FormulaFormat = sus2TriadFormat
-		chord.formatArgs = []interface{}{chord.Root()}
-	case Sus4TriadIntervals.String():
-		chord.Quality = MajorQuality // TODO check this
-		chord.FormulaFormat = sus4TriadFormat
-		chord.formatArgs = []interface{}{chord.Root()}
-	case MajorSeventhIntervals.String():
-		chord.Quality = MajorQuality
-		chord.FormulaFormat = seventhChordFormat
-		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
-	case MinorSeventhIntervals.String():
-		chord.Quality = MinorQuality
-		chord.FormulaFormat = seventhChordFormat
-		chord.formatArgs = []interface{}{chord.Root(), chord.Quality}
-	case DominantSeventhIntervals.String():
-		chord.Quality = MajorQuality
-		chord.FormulaFormat = dominantSeventhChordFormat
-		chord.formatArgs = []interface{}{chord.Root()}
-	case HalfDiminishedSeventhIntervals.String():
-		chord.Quality = DiminishedQuality
-		chord.FormulaFormat = halfDiminishedSeventhChordFormat
-		chord.formatArgs = []interface{}{chord.Root()}
-	default:
-		panic("unknown formula")
-	}
-
 	return chord
 }
 
 func (chord Chord) String() string {
-	return fmt.Sprintf(
-		chord.FormulaFormat,
-		chord.formatArgs...,
-	)
+	return defaultFormatter.chordFormats[chord.Intervals.Formula()](chord)
 }
 
 func (chord Chord) Root() Note {
 	return chord.Notes[0]
+}
+
+func (chord Chord) Third() Note {
+	if len(chord.Intervals) < 3 {
+		return NilNote
+	}
+
+	return chord.Notes[1]
+}
+
+func (chord Chord) Quality() string {
+	switch chord.Root().AscendingDistance(chord.Third()) {
+	case NilInterval, MajorThird:
+		return MajorQuality
+	case MinorThird:
+		return MinorQuality
+	case MajorSecond, PerfectFourth: // TODO check this
+		return MajorQuality
+	default:
+		panic("unknown quality")
+	}
 }
 
 func (chord Chord) NotesCount() int {

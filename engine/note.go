@@ -1,6 +1,8 @@
 package engine
 
 var (
+	NilNote = Note{Code: -1}
+
 	Ab = Note{Code: 11, Letter: "A", Flat: true}
 	A  = Note{Code: 0, Letter: "A"}
 	Ax = Note{Code: 1, Letter: "A", Sharp: true}
@@ -30,6 +32,7 @@ var (
 	Gx = Note{Code: 11, Letter: "G", Sharp: true}
 
 	EnharmonicEquivalentAccidentals = map[Note]Note{
+		Ax: Bb,
 		B:  Cb,
 		C:  Bx,
 		E:  Fb,
@@ -41,14 +44,34 @@ var (
 	}
 
 	// TODO remove this
-	NoteLetterToCode = map[string]int{
-		"A": 0,
-		"B": 1,
-		"C": 2,
-		"D": 3,
-		"E": 4,
-		"G": 6,
-		"F": 5,
+	NoteLetterToCode = map[string]Note{
+		"Ab": Ab,
+		"A":  A,
+		"A#": Ax,
+
+		"Bb": Bb,
+		"B":  B,
+		"Bx": Bx,
+
+		"Cb": Cb,
+		"C":  C,
+		"C#": Cx,
+
+		"Db": Db,
+		"D":  D,
+		"D#": Dx,
+
+		"Eb": Eb,
+		"E":  E,
+		"Ex": Ex,
+
+		"Fb": Fb,
+		"F":  F,
+		"F#": Fx,
+
+		"Gb": Gb,
+		"G":  G,
+		"G#": Gx,
 	}
 )
 
@@ -60,6 +83,10 @@ type Note struct {
 }
 
 func (note Note) AscendingDistance(to Note) Interval {
+	if to == NilNote || note == NilNote {
+		return NilInterval
+	}
+
 	if to.Code < note.Code {
 		return Interval((MusicalNotesCount + to.Code) - note.Code)
 	}
@@ -81,11 +108,11 @@ func (note Note) IsFlat() bool {
 
 func (note Note) String() string {
 	if note.Flat {
-		return note.Letter + "b"
+		return note.Letter + defaultFormatter.flatNotation
 	}
 
 	if note.Sharp {
-		return note.Letter + "#"
+		return note.Letter + defaultFormatter.sharpNotation
 	}
 
 	return note.Letter

@@ -10,12 +10,17 @@ type (
 	Intervals []Interval
 )
 
-func (intervals Intervals) String() string {
+func (intervals Intervals) Formula() ChordFormula {
 	var intervalsString []string
 
 	for _, interval := range intervals {
 		intervalsString = append(intervalsString, strconv.Itoa(int(interval)))
 	}
 
-	return strings.Join(intervalsString, " ")
+	return ChordFormula(strings.Join(intervalsString, " "))
+
+}
+
+func (intervals Intervals) String() string {
+	return string(intervals.Formula())
 }
