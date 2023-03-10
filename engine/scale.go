@@ -25,6 +25,16 @@ var (
 		MinorSeventh,
 	}
 
+	PentatonicMajorScale = Intervals{
+		PerfectUnison,
+		MajorSecond,
+		MajorThird,
+		PerfectFourth,
+		PerfectFifth,
+		MajorSixth,
+		MajorSeventh,
+	}
+
 	ChromaticScaleWithSharps = []Note{A, Ax, B, C, Cx, D, Dx, E, F, Fx, G, Gx}
 	ChromaticScaleWithFlats  = []Note{A, Bb, B, C, Db, D, Eb, E, F, Gb, G, Ab}
 )
@@ -121,18 +131,18 @@ func (s Scale) notesFromChromaticScale(dict []Note) []Note {
 }
 
 func distinctNotes(notes []Note) []Note {
-	seen := make(map[string]struct{})
+	seen := make(map[rune]struct{})
 
 	for i := range notes {
-		if _, ok := seen[notes[i].Letter]; ok {
+		if _, ok := seen[notes[i].Symbol]; ok {
 			if _, ok := EnharmonicEquivalentAccidentals[notes[i]]; ok {
 				notes[i] = EnharmonicEquivalentAccidentals[notes[i]]
 			} else {
 				notes[i-1] = EnharmonicEquivalentAccidentals[notes[i-1]]
-				seen[notes[i].Letter] = struct{}{}
+				seen[notes[i].Symbol] = struct{}{}
 			}
 		} else {
-			seen[notes[i].Letter] = struct{}{}
+			seen[notes[i].Symbol] = struct{}{}
 		}
 	}
 

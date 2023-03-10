@@ -3,33 +3,33 @@ package engine
 var (
 	NilNote = Note{Code: -1}
 
-	Ab = Note{Code: 11, Letter: "A", Flat: true}
-	A  = Note{Code: 0, Letter: "A"}
-	Ax = Note{Code: 1, Letter: "A", Sharp: true}
+	Ab = Note{Code: 11, Symbol: 'A', Flat: true}
+	A  = Note{Code: 0, Symbol: 'A'}
+	Ax = Note{Code: 1, Symbol: 'A', Sharp: true}
 
-	Bb = Note{Code: 1, Letter: "B", Flat: true}
-	B  = Note{Code: 2, Letter: "B"}
-	Bx = Note{Code: 3, Letter: "B", Sharp: true}
+	Bb = Note{Code: 1, Symbol: 'B', Flat: true}
+	B  = Note{Code: 2, Symbol: 'B'}
+	Bx = Note{Code: 3, Symbol: 'B', Sharp: true}
 
-	Cb = Note{Code: 2, Letter: "C", Flat: true}
-	C  = Note{Code: 3, Letter: "C"}
-	Cx = Note{Code: 4, Letter: "C", Sharp: true}
+	Cb = Note{Code: 2, Symbol: 'C', Flat: true}
+	C  = Note{Code: 3, Symbol: 'C'}
+	Cx = Note{Code: 4, Symbol: 'C', Sharp: true}
 
-	Db = Note{Code: 4, Letter: "D", Flat: true}
-	D  = Note{Code: 5, Letter: "D"}
-	Dx = Note{Code: 6, Letter: "D", Sharp: true}
+	Db = Note{Code: 4, Symbol: 'D', Flat: true}
+	D  = Note{Code: 5, Symbol: 'D'}
+	Dx = Note{Code: 6, Symbol: 'D', Sharp: true}
 
-	Eb = Note{Code: 6, Letter: "E", Flat: true}
-	E  = Note{Code: 7, Letter: "E"}
-	Ex = Note{Code: 8, Letter: "E", Sharp: true}
+	Eb = Note{Code: 6, Symbol: 'E', Flat: true}
+	E  = Note{Code: 7, Symbol: 'E'}
+	Ex = Note{Code: 8, Symbol: 'E', Sharp: true}
 
-	Fb = Note{Code: 7, Letter: "F", Flat: true}
-	F  = Note{Code: 8, Letter: "F"}
-	Fx = Note{Code: 9, Letter: "F", Sharp: true}
+	Fb = Note{Code: 7, Symbol: 'F', Flat: true}
+	F  = Note{Code: 8, Symbol: 'F'}
+	Fx = Note{Code: 9, Symbol: 'F', Sharp: true}
 
-	Gb = Note{Code: 9, Letter: "G", Flat: true}
-	G  = Note{Code: 10, Letter: "G"}
-	Gx = Note{Code: 11, Letter: "G", Sharp: true}
+	Gb = Note{Code: 9, Symbol: 'G', Flat: true}
+	G  = Note{Code: 10, Symbol: 'G'}
+	Gx = Note{Code: 11, Symbol: 'G', Sharp: true}
 
 	EnharmonicEquivalentAccidentals = map[Note]Note{
 		Ax: Bb,
@@ -42,42 +42,11 @@ var (
 		Ex: F,
 		Fb: E,
 	}
-
-	// TODO remove this
-	NoteLetterToCode = map[string]Note{
-		"Ab": Ab,
-		"A":  A,
-		"A#": Ax,
-
-		"Bb": Bb,
-		"B":  B,
-		"Bx": Bx,
-
-		"Cb": Cb,
-		"C":  C,
-		"C#": Cx,
-
-		"Db": Db,
-		"D":  D,
-		"D#": Dx,
-
-		"Eb": Eb,
-		"E":  E,
-		"Ex": Ex,
-
-		"Fb": Fb,
-		"F":  F,
-		"F#": Fx,
-
-		"Gb": Gb,
-		"G":  G,
-		"G#": Gx,
-	}
 )
 
 type Note struct {
 	Code   int
-	Letter string
+	Symbol rune
 	Sharp  bool
 	Flat   bool
 }
@@ -108,14 +77,14 @@ func (note Note) IsFlat() bool {
 
 func (note Note) String() string {
 	if note.Flat {
-		return note.Letter + defaultFormatter.flatNotation
+		return string(note.Symbol) + defaultFormatter.flatNotation
 	}
 
 	if note.Sharp {
-		return note.Letter + defaultFormatter.sharpNotation
+		return string(note.Symbol) + defaultFormatter.sharpNotation
 	}
 
-	return note.Letter
+	return string(note.Symbol)
 }
 
 func (note Note) IsSharp() bool {
